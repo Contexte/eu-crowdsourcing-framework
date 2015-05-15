@@ -1,0 +1,16 @@
+[{
+	"pdf":"my_pdf_name.pdf",
+	"page": 3,
+	"questions":{
+		"First question (first paramater of answer determines its type : single or multiple answers possible)":["single", "yes", "no"],
+		"Second question (multiple answers possible)":["multiple", "first answer", "second answer", "third answer"]
+	}
+},
+{
+	"pdf":"another_pdf_name.pdf",
+	"page": 6,
+	"questions":{
+		"First question (only one answer possible)":["single", "first answer", "second answer"]
+		"Second question":["single", "a", "b"]
+	}		
+}]
