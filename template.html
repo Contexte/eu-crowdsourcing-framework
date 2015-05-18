@@ -1,6 +1,14 @@
-<div>
-<h1>here's the fucking page</h1>
+<div id='success' style='display:none;'>
+	<h2>The task has been successfully saved.</h2>
+</div>
 
+<div id='finish'>
+	<h2> You have successfully contributed to all the tasks in this project. Tahnk you for your time. </h2>
+</div>
+
+<div id='working_page'>
+<h1>here's the fucking page</h1>
+	
 	<div id="document">
 		Here should be the flippin' <a href="#"> document </a>
 		<canvas id="the_canvas" style="border: 1px solid black;"/>
@@ -12,6 +20,18 @@
 
 <script src="http://mozilla.github.com/pdf.js/build/pdf.js"></script>  
 <script>
+
+var scale = 1.5;
+var canvas = document.getElementById('the_canvas');
+var context = canvas.getContext('2d');
+
+//Not sure we should keep that worker in production
+PDFJS.workerSrc = 'http://mozilla.github.com/pdf.js/build/pdf.worker.js';
+
+function resetTask(){
+	$('#questions').empty();
+	context.clearRect ( 0 , 0 , canvas.width, canvas.height );
+}
 
 
 function loadUserProgress() {
@@ -27,51 +47,31 @@ function loadUserProgress() {
 
 
 pybossa.taskLoaded(function(task, deferred) {
+	if ( !$.isEmptyObject(task) ) {
 
+		//Here's the code to get the PDF name from the "pdfs" folder and display it into the page
+		PDFJS.getDocument("../../../uploads/pdfs/" + task.info.pdf).then(function(pdf) {
+			pdf.getPage(task.info.page).then(function(page) {
+				var viewport = page.getViewport(scale);
 
-	//Not sure we should keep that worker in production
-	PDFJS.workerSrc = 'http://mozilla.github.com/pdf.js/build/pdf.worker.js';
+				canvas.height = viewport.height;
+				canvas.width = viewport.width;
 
-	//Here's the code to get the PDF name from the "pdfs" folder and display it into the page
-	PDFJS.getDocument("../../../uploads/pdfs/" + task.info.pdf).then(function(pdf) {
-		pdf.getPage(task.info.page).then(function(page) {
-			var scale = 1.5;
-			var viewport = page.getViewport(scale);
-
-			var canvas = document.getElementById('the_canvas');
-			var context = canvas.getContext('2d');
-			canvas.height = viewport.height;
-			canvas.width = viewport.width;
-
-			var renderContext = {
-				canvasContext: context,
-				viewport: viewport
-			};
-			page.render(renderContext);
+				var renderContext = {
+					canvasContext: context,
+					viewport: viewport
+				};
+				page.render(renderContext);
+			})
 			deferred.resolve(task);
-		})
-	});
-	
-	
-
-
-    /*if ( !$.isEmptyObject(task) ) {
-	deferred.resolve(task);
-        /*var img = $('<img />');
-        img.load(function() {
-            // continue as soon as the image is loaded
-            deferred.resolve(task);
-        });
-        img.attr('src', task.info.url_b).css('height', 460);
-        img.addClass('img-thumbnail img-responsive');
-        task.info.image = img;
-    }
-    else {
-        deferred.resolve(task);
-    }*/
+		});
+	} else {
+        	deferred.resolve(task);
+	}
 });
 
 pybossa.presentTask(function(task, deferred) {
+    loadUserProgress();
     // Code used to create the form
     if ( !$.isEmptyObject(task) ) {
 	$('#questions').append("<p><span class='question'></span><form id='choices'></form></p>");
@@ -87,42 +87,22 @@ pybossa.presentTask(function(task, deferred) {
 	}
 	$('#choices').append("<input id='submit' type='submit' value='Submit'>")
 
-    	//loadUserProgress();
-        //$('#document_link').html('').append(task.info.pdf);
-        //$("#question").html(task.info.question);
-	
 	// Submitting the infos of the form and saving it
 	$('#choices').submit(function(event) {
-		var answer = $('form').serializeArray();
-		//permet de voir la réponse... TEST
-		console.log(JSON.stringify(answer));
 		event.preventDefault();
-		//pybossa.saveTask(task.id, answer).done(function(){
-		//	deferred.resolve();
-		//}
+		var answer = $('form').serializeArray();
+		pybossa.saveTask(task.id, answer).done(function(){
+			$("#success").fadeIn();
+			resetTask();
+			setTimeout(function() { $("#success").fadeOut() }, 2000);
+			deferred.resolve();
+		});
 	});
-        /*$('.btn-answer').off('click').on('click', function(evt) {
-            var answer = $(this).attr("value");
-            if (typeof answer != 'undefined') {
-                //console.log(answer);
-                pybossa.saveTask(task.id, answer).done(function() {
-                    deferred.resolve();
-                });
-                $("#loading").fadeIn(500);
-                if ($("#disqus_thread").is(":visible")) {
-                    $('#disqus_thread').toggle();
-                    $('.btn-disqus').toggle();
-                }
-            }
-            else {
-                $("#error").show();
-            }
-        });
-        $("#loading").hide();$*/
     }
     else {
         $(".skeleton").hide();
         $("#loading").hide();
+	$("#working_page").hide();
         $("#finish").fadeIn(500);
     }
 });
