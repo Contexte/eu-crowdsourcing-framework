@@ -2,8 +2,8 @@
 	<h2>The task has been successfully saved.</h2>
 </div>
 
-<div id='finish'>
-	<h2> You have successfully contributed to all the tasks in this project. Tahnk you for your time. </h2>
+<div id='finish' style='display:none;'>
+	<h2> You have successfully contributed to all the tasks in this project. Thank you for your time. </h2>
 </div>
 
 <div id='working_page'>
@@ -48,22 +48,16 @@ function loadUserProgress() {
 
 pybossa.taskLoaded(function(task, deferred) {
 	if ( !$.isEmptyObject(task) ) {
-
-		//Here's the code to get the PDF name from the "pdfs" folder and display it into the page
+		//Here's the code to get the PDF name from /upload/pdfs/ located at the pybossa root folder 
+		//and display it into the page
 		PDFJS.getDocument("../../../uploads/pdfs/" + task.info.pdf).then(function(pdf) {
 			pdf.getPage(task.info.page).then(function(page) {
-				var viewport = page.getViewport(scale);
 
-				canvas.height = viewport.height;
-				canvas.width = viewport.width;
+				
+				task.p = page;
 
-				var renderContext = {
-					canvasContext: context,
-					viewport: viewport
-				};
-				page.render(renderContext);
+				deferred.resolve(task);
 			})
-			deferred.resolve(task);
 		});
 	} else {
         	deferred.resolve(task);
@@ -71,40 +65,53 @@ pybossa.taskLoaded(function(task, deferred) {
 });
 
 pybossa.presentTask(function(task, deferred) {
-    loadUserProgress();
-    // Code used to create the form
-    if ( !$.isEmptyObject(task) ) {
-	$('#questions').append("<p><span class='question'></span><form id='choices'></form></p>");
-	for(question in task.info.questions){
-		$('#choices').append("<fieldset> <legend>" + question + ":</legend>");
-		var answer_type = task.info.questions[question][0];
-		for(var i = 1; i < task.info.questions[question].length; i++){
-			var answer = task.info.questions[question][i]
-			// Create the answers according to their type.
-			$('#choices').append("<input type='radio' name='" + question + (answer_type  === 'multiple' ? ":" + answer : "")  + "' value='"+answer+ "'>"+answer+"<br>");
-		}
-		$('#choices').append("</fieldset><br>");
-	}
-	$('#choices').append("<input id='submit' type='submit' value='Submit'>")
+	loadUserProgress();
+	// Code used to create the form
+	if ( !$.isEmptyObject(task) ) {
+				var viewport = task.p.getViewport(scale);
 
-	// Submitting the infos of the form and saving it
-	$('#choices').submit(function(event) {
-		event.preventDefault();
-		var answer = $('form').serializeArray();
-		pybossa.saveTask(task.id, answer).done(function(){
-			$("#success").fadeIn();
-			resetTask();
-			setTimeout(function() { $("#success").fadeOut() }, 2000);
-			deferred.resolve();
+				canvas.height = viewport.height;
+				canvas.width = viewport.width;
+
+
+				var renderContext = {
+					canvasContext: context,
+					viewport: viewport
+				};
+		task.p.render(renderContext);
+
+		$('#questions').append("<p><span class='question'></span><form id='choices'></form></p>");
+		for(question in task.info.questions){
+			$('#choices').append("<fieldset> <legend>" + question + ":</legend>");
+			var answer_type = task.info.questions[question][0];
+			for(var i = 1; i < task.info.questions[question].length; i++){
+				var answer = task.info.questions[question][i]
+				// Create the answers according to their type.
+				$('#choices').append("<input type='radio' name='" + question + (answer_type  === 'multiple' ? ":" + answer : "")  + "' value='"+answer+ "'>"+answer+"<br>");
+			}
+			$('#choices').append("</fieldset><br>");
+		}
+		$('#choices').append("<input id='submit' type='submit' value='Submit'>")
+
+		// Submitting the infos of the form and saving it
+		$('#choices').submit(function(event) {
+			event.preventDefault();
+			$('html,body').scrollTop(0);
+			
+			var answer = $('form').serializeArray();
+			pybossa.saveTask(task.id, answer).done(function(){
+				$("#success").fadeIn();
+				resetTask();
+				setTimeout(function() { $("#success").fadeOut() }, 2000);
+				deferred.resolve();
+			});
 		});
-	});
-    }
-    else {
-        $(".skeleton").hide();
-        $("#loading").hide();
-	$("#working_page").hide();
-        $("#finish").fadeIn(500);
-    }
+	} else {
+		$(".skeleton").hide();
+		$("#loading").hide();
+		$("#working_page").hide();
+		$("#finish").fadeIn(500);
+	}
 });
 
 pybossa.run('testproj');
