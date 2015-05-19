@@ -14,8 +14,10 @@
 <h1>here's the fucking page</h1>
 	
 	<div id="document">
-		
-		<canvas id="the_canvas" style="border: 1px solid black;"/>
+		<div id="loading" class="alert alert-info">
+			<strong>Loading the PDF file...</strong>
+		</div>
+		<canvas id="the_canvas" style="border: 1px solid black; display:none;"/>
 	</div>
 
 	<div id="questions">
@@ -69,6 +71,8 @@ pybossa.presentTask(function(task, deferred) {
 	loadUserProgress();
 	// Code used to create the form
 	if ( !$.isEmptyObject(task) ) {
+		$('#loading').hide();
+		$('#the_canvas').show();
 		var viewport = task.p.getViewport(scale);
 		canvas.height = viewport.height;
 		canvas.width = viewport.width;
