@@ -184,7 +184,7 @@ Déploiement rapide
 
 En ligne de commande, utilisant l'outil pbs [configuré](#configure).
 
-- Copier l'intégralité de ce dossier n'importe où, avec n'importe quel nom.
+- Copier l'intégralité des fichiers non-cachés de ce dossier n'importe où, avec n'importe quel nom.
 
 - Modifier les fichiers
 
