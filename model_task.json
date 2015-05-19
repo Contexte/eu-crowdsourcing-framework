@@ -1,6 +1,7 @@
 [{
 	"pdf":"my_pdf_name.pdf",
 	"page": 3,
+	"statement": "What does the user have to do ? For example, it could be 'Look at the 4th paragraphe of that consultation and check the corresponding checkbox (in your opinion) at the end of the document.' If not explicitely defined, it defaults to : 'Check the checkboxes at the end of the document to help filing this document.'",
 	"questions":{
 		"First question (first paramater of answer determines its type : single or multiple answers possible)":["single", "yes", "no"],
 		"Second question (multiple answers possible)":["multiple", "first answer", "second answer", "third answer"]
