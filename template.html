@@ -1,7 +1,3 @@
-<!-- <div class="progress progress-striped">
-	<div id="progress" rel="tooltip" title="#" class="progress-bar" style="width: 0%; role="progressbar""></div>
-</div> -->
-
 <div id='success' style='display:none;'>
 	<h2>The task has been successfully saved.</h2>
 </div>
@@ -45,18 +41,6 @@ function resetTask(){
 }
 
 
-/*function loadUserProgress() {
-    pybossa.userProgress('testproj').done(function(data){
-        var pct = Math.round((data.done*100)/data.total);
-        $("#progress").css("width", pct.toString() +"%");
-        $("#progress").attr("title", pct.toString() + "% completed!");
-        $("#progress").tooltip({'placement': 'left'}); 
-        $("#total").text(data.total);
-        $("#done").text(data.done);
-    });
-}*/
-
-
 pybossa.taskLoaded(function(task, deferred) {
 	if ( !$.isEmptyObject(task) ) {
 
@@ -74,7 +58,6 @@ pybossa.taskLoaded(function(task, deferred) {
 });
 
 pybossa.presentTask(function(task, deferred) {
-	loadUserProgress();
 	// Code used to create the form
 	if ( !$.isEmptyObject(task) ) {
 		$('#statement').html(task.info.statement === undefined ? "Check the checkboxes at the end of the document to help us filing it." : task.info.statement);
@@ -97,8 +80,14 @@ pybossa.presentTask(function(task, deferred) {
 		// Generating  the HTML
 		$('#questions').append("<p><form id='choices'></form></p>");
 		for(question in task.info.questions){
-			$('#choices').append("<fieldset id='question" + j + "'> <legend>" + question + "</legend> </fieldset>");
 			var answer_type = task.info.questions[question][0];
+                        $('#choices').append("<fieldset id='question" + 
+                                                j + 
+                                                "'> <legend>" + 
+                                                question + 
+                                                "</legend>" + 
+                                                 (answer_type === 'multiple' ? 'You can check <strong>several</strong> answers' : 'You can <strong>only</strong> check <strong>one</strong> answer') +
+                                                "<br></fieldset>");
 			for(var i = 1; i < task.info.questions[question].length; i++){
 				var answer = task.info.questions[question][i]
 				// Create the answers according to their type.
