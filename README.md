@@ -186,12 +186,13 @@ En ligne de commande, utilisant l'outil pbs [configuré](#configure).
 
 - Copier l'intégralité des fichiers non-cachés de ce dossier n'importe où, avec n'importe quel nom.
 
-- Modifier les fichiers
+- Modifier les fichiers (Les fichiers vides peuvent le rester)
 
 	- tutorial.html _vide par défaut_
 	- long_description.md _vide par défaut_
 	- project.json
 	- model_tasks.json <i>Ou créez votre fichier de tâche en JSON correspondant à model_tasks.json</i>
+	- template.html _En changeant UNIQUEMENT le nom (short name dans project.json et PAS name) à la fin du fichier dans pybossa.run(project short name)_
 
 - Lancer :
 	pbs create_project
