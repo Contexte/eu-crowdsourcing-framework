@@ -3,14 +3,18 @@
 </div>
 
 <div id='finish' style='display:none;'>
-	<h2> You have successfully contributed to all the tasks in this project. Thank you for your time. </h2>
+	<h2>You have successfully contributed to all the tasks in this project. Thank you for your time. </h2>
+</div>
+
+<div id='missing_check_box' style='display:none;'>
+	<h2 id='missing_check_box_phrase' style='color:red;'>All questions are mandatory.</h2>
 </div>
 
 <div id='working_page'>
 <h1>here's the fucking page</h1>
 	
 	<div id="document">
-		Here should be the flippin' <a href="#"> document </a>
+		
 		<canvas id="the_canvas" style="border: 1px solid black;"/>
 	</div>
 
@@ -52,10 +56,7 @@ pybossa.taskLoaded(function(task, deferred) {
 		//and display it into the page
 		PDFJS.getDocument("../../../uploads/pdfs/" + task.info.pdf).then(function(pdf) {
 			pdf.getPage(task.info.page).then(function(page) {
-
-				
 				task.p = page;
-
 				deferred.resolve(task);
 			})
 		});
@@ -68,43 +69,67 @@ pybossa.presentTask(function(task, deferred) {
 	loadUserProgress();
 	// Code used to create the form
 	if ( !$.isEmptyObject(task) ) {
-				var viewport = task.p.getViewport(scale);
+		var viewport = task.p.getViewport(scale);
+		canvas.height = viewport.height;
+		canvas.width = viewport.width;
 
-				canvas.height = viewport.height;
-				canvas.width = viewport.width;
-
-
-				var renderContext = {
-					canvasContext: context,
-					viewport: viewport
-				};
+		var renderContext = {
+			canvasContext: context,
+			viewport: viewport
+		};
+		
+		// Generating the PDF on the canvas
 		task.p.render(renderContext);
 
-		$('#questions').append("<p><span class='question'></span><form id='choices'></form></p>");
+		var j = 1
+		
+		// Generating  the HTML
+		$('#questions').append("<p><form id='choices'></form></p>");
 		for(question in task.info.questions){
-			$('#choices').append("<fieldset> <legend>" + question + ":</legend>");
+			$('#choices').append("<fieldset id='question" + j + "'> <legend>" + question + "</legend> </fieldset>");
 			var answer_type = task.info.questions[question][0];
 			for(var i = 1; i < task.info.questions[question].length; i++){
 				var answer = task.info.questions[question][i]
 				// Create the answers according to their type.
-				$('#choices').append("<input type='radio' name='" + question + (answer_type  === 'multiple' ? ":" + answer : "")  + "' value='"+answer+ "'>"+answer+"<br>");
+				$("#question"+j).append("<input class='possible_answer' type='radio' name='" + question + (answer_type  === 'multiple' ? ":" + answer : "")  + "' value='"+answer+ "'>"+answer+"<br>");
 			}
-			$('#choices').append("</fieldset><br>");
+			$('#choices').append("<br>");
+			j++;
 		}
 		$('#choices').append("<input id='submit' type='submit' value='Submit'>")
 
-		// Submitting the infos of the form and saving it
+		// Submitting the infos of the form and saving it in DB
 		$('#choices').submit(function(event) {
 			event.preventDefault();
 			$('html,body').scrollTop(0);
-			
-			var answer = $('form').serializeArray();
-			pybossa.saveTask(task.id, answer).done(function(){
-				$("#success").fadeIn();
-				resetTask();
-				setTimeout(function() { $("#success").fadeOut() }, 2000);
-				deferred.resolve();
+
+			var unchecked = false;
+
+			var fieldsets = $('fieldset');
+			fieldsets.each(function(index, value){
+				fieldset = $(this);
+
+				//check is at least 1 box is checked in the fieldset
+				var checked = fieldset.find('input:checked').size() > 0;
+
+				if(!checked){
+					fieldset.find('legend').css('color','red');
+					unchecked = true;
+				}
 			});
+
+			if(unchecked){
+				$('#missing_check_box').show();
+			} else {
+				$('#missing_check_box').hide();
+				var answer = $('form').serializeArray();
+				pybossa.saveTask(task.id, answer).done(function(){
+					$("#success").fadeIn();
+					resetTask();
+					setTimeout(function() { $("#success").fadeOut() }, 2000);
+					deferred.resolve();
+				});
+			}
 		});
 	} else {
 		$(".skeleton").hide();
