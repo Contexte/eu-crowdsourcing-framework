@@ -11,7 +11,7 @@
 	"pdf":"another_pdf_name.pdf",
 	"page": 6,
 	"questions":{
-		"First question (only one answer possible)":["single", "first answer", "second answer"]
+		"First question (only one answer possible)":["single", "first answer", "second answer"],
 		"Second question":["single", "a", "b"]
 	}		
 }]
