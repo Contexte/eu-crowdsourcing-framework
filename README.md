@@ -191,7 +191,7 @@ En ligne de commande, utilisant l'outil pbs [configuré](#configure).
 	- tutorial.html _vide par défaut_
 	- long_description.md _vide par défaut_
 	- project.json
-	- tests_tasks.json <i>Ou créez votre fichier de tâche en JSON correspondant à model_tasks.json</i>
+	- model_tasks.json <i>Ou créez votre fichier de tâche en JSON correspondant à model_tasks.json</i>
 
 - Lancer :
 	pbs create_project
