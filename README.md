@@ -1,12 +1,13 @@
 comeurop
 ========
 
-Pour aller au tutorial pas à pas pour déployer un projet : [tutorial](#tutorial)
+Pour déployer rapidement un projet, voir : [Déploiement rapide](#deploiement_rapide)
 
+<a name="configure"/>
 Configurer pbs
 --------------
 
-En principe, pbs est déjà configuré avec la clé du compte amdinistrateur principal ( l'administrateur principal est, par défaut, le premir utilisateur à s'inscrire dans PyBossa, il peut ensutie passer les droits d'admin à d'autres users ).
+En principe, pbs est déjà configuré avec la clé du compte amdinistrateur principal ( l'administrateur principal est, par défaut, le premir utilisateur à s'inscrire dans PyBossa, il peut ensuite passer les droits d'admin à d'autres users ).
 
 La configuration se fait dans le fichier <b>.pybossa.cfg</b>, qui doit se trouver dans le <b>HOME</b> et dont voici la structure :
 
@@ -19,16 +20,15 @@ Dans le cas où le fichier ne serait pas rempli, il est toujours possible d'effe
 	pbs --server http://your_server.com --api-key your_key subcommand
 
 
-
 1) Création d'un projet
 -----------------------
 
 La création d'un projet peut se faire de deux manières : sur le site web ou en ligne de commande. Si la méthode avec le site web est choisie, il faudra tout faire avec ( ce qui implique créer un fichier CSV souvent relativement complexe, voir [charger des tâches](#charger_des_taches) ).
 
-Mais un projet peut aussi être créé en utilisant pbs. 
+Mais un projet peut aussi être créé, plus simplement, en ligne de commande en utilisant pbs. 
 
-Pour ce faire, il faut créer un dossier et créer un fichier [project.json](#project.json) à l'intérieur de celui-ci.
-Puis créer le projet dans le site avec :
+Il faut créer un dossier, ainsi qu'un fichier [project.json (voir les détails du fichier)](#project.json) à l'intérieur de celui-ci.
+Puis générer le projet dans le site avec :
 
 	pbs create_project
 
@@ -55,10 +55,9 @@ Les tâches sont les éléments précis sur lesquels intervient un membre de la 
 Exemple :
 
 	{
-		"name": "Test project",
-		"short_name": "testproj",
-		"description": "This is a test project",
-		"question": "This is just a test project. Do you like it ?" #optionnel
+		"name": "Nom Complet de Mon Projet",
+		"short_name": "slug du projet, utilisé par l'api RESTFUL pour y accéder",
+		"description": "Description courte du projet ; la longue se fait ailleurs",
 	}
 
 
@@ -68,10 +67,9 @@ Exemple :
 
   <b>NB :</b> dans pybossa, un script JS nommé PyBossa.JS est automatiquement appelé à chaque tâche. Ce script permet d'utiliser les fonctions : <i>pybossa.presentTask()</i>( invoquée pendant que se charge la tâche, et qui donc fait le lien avec la page HTML ) et <i>pybossa.taskLoaded</i>(Je ne sais pas encore exactement quand est-ce qu'elle est appelée, mais je suppose que c'est lorsque l'utilisateur change de tâche).
 
-- Un fichier <b>tutotial.html</b>, qui est chargé (il me semble) la première fois que  l'utilisateur souhaite contribuer au projet.
+- Un fichier <b>tutotial.html</b>, qui est chargé (il me semble) la première fois que l'utilisateur souhaite contribuer au projet.
  
 - Un fichier <b>long_description.md</b>. Tout est dans le titre.
-
 
 
 ### Le projet est aussi supposé contenir :
@@ -90,28 +88,33 @@ Pour ce faire, 2 méthodes :
 
 - Par le site web avec un fichier CSV ( ou une Google SpreadSheet ) -- difficile lorsque les objets sont complexes, mais il est possible de passer par un logiciel tiers, si la ligne de commande est compliquée, par exemple [JSON to CSV converter](https://json-csv.com/). Dans ce cas, il vaut mieux faire toutes les tâches d'un seul coup, puisqu'un seul objet JSON peut contenir toutes le tâches du projet, voir l'exemple un peu plus bas).
 - En ligne de commande en utilisant pbs ( avec la syntaxe : <i>
-	pbs add_tasks --tasks-file my_tasks.csv|json --tasks-type=csv|json [redundancy=1] #Si on ne vuet qu'une réponse par tâch, défaut à 30
+	pbs add_tasks --tasks-file my_tasks.csv|json --tasks-type=csv|json [redundancy=1] #Si on ne veut qu'une réponse par tâch, défaut à 30
 	</i>, où deux types de fichier sont utilisables : csv ou JSON (sahcant qu'en définitive, PyBossa utilisera forcément un fichier JSON).
 
+<a name="tasks.json"/>
 Les fichiers devront contenir les informations spécifiques aux tâches, voici un exemple de fichier JSON :
 
 	[{
-		"document":"test.pdf", # Les PDF lus doivent être stockés sur la machine, voir  plus bas.
-        	"page":3,
-        	"questions":{
-               		"do you want chewing gum?":["yep", "no"],
-               		"do you like apple pies?":["ojh", "jhbgf"]
-        	}
+	        "pdf":"my_pdf_name.pdf",
+	        "page": 3,
+	        "statement": "What does the user have to do ? For example, it could be 'Look at the 4th paragraphe of that consultation and check the corresponding checkbox (in your opinion) at the end of the document.' If not explicitely defined, it defaults to : 'Check the checkboxes at the end of the document to help filing this document.'",
+	        "questions":{
+	                "First question (first paramater of answer determines its type : single or multiple answers possible)":["single", "yes", "no"],
+	                "Second question (multiple answers possible)":["multiple", "first answer", "second answer", "third answer"]
+	        }
 	},
 	{
-		"document":"truc.pdf",
-		etc...
+	        "pdf":"another_pdf_name.pdf",
+	        "page": 6,
+	        "questions":{
+               	 "First question (only one answer possible)":["single", "first answer", "second answer"]
+               	 "Second question":["single", "a", "b"]
+        	}
 	}]
-
 
 <b>NB :</b> De mes tests est ressorti que l'objet JSON doit obligatoirement être mis dans un tableau ( les [] en début et fin de fichier sont obligatoires). Sinon le fichier n'est simplement pas compris par PyBossa.
 
-<b>NB2 : </b> Toutes les informations contenues dans un objet JSON vont dans l'attribut <i>info</i> de l'objet <i>task</i>, accessible dans le javascript du template par ce biais.
+<b>NB2 : </b> Toutes les informations contenues dans un objet JSON vont dans l'attribut <i>info</i> de l'objet <i>task</i>, accessible dans le javascript du template par ce biais. <b>task.info.yourStuff</b>
 
 La mise en forme se fera ensuite dans le fichier <b>template.html</b>.
 
@@ -127,14 +130,40 @@ La commande est :
 
 Une fois cette commande lancée, le projet entre dans les projets disponibles sur le site.
 
+A chaque modification du template, elle a besoin d'être relancée.
 
+## Le template
 
-### Le template
+[Lien utile (StackOverflow)](#https://stackoverflow.com/questions/25035717/pybossa-loading-and-presenting-tasks/25055844#25055844)
 
-[Lien utile](#https://stackoverflow.com/questions/25035717/pybossa-loading-and-presenting-tasks/25055844#25055844)
+Le template actuel contient plusieurs sections.
 
+### Le HTML
 
+Très léger, la plupart des lignes n'aparaissent que suite à des events : plus de tâches disponibles, tâche accomplie, etc...
 
+Il est largement modifié / complété par le JS qui se trouve dans le même fichier.
+
+### pybossa.taskLoaded
+
+Permet de charger/précharger une tâche. Lorsque l'utilisateur arrive sur sa première tâche, cette fonction est appelée une première fois pour la tâche en cours, puis une seconde fois pour pré-charger la seconde tâche.
+
+Lorsque la tâche ( ici il ne s'agit en réalité que du PDF ) a été chargée, on appelle deferred.resolve(task), qui lance la prochaine étape.
+
+<b>Resumé</b> : Ici on ne fait que charger/précharger le PDF.
+
+### pybossa.presentTask
+
+Cette méthode contient toute la logique d'affichage et de présentation de la tâche à l'utilisateur.
+
+Si la tâche est valide (i.e, si il reste des tâches dans le projet), elle contient 3 grandes catégories, qui sont :
+
+- Dessiner le PDF sur le canvas
+- Générer le formulaire HTML
+- Permettre de sauvegarder (et de modifier l'affichage du document HTML en conséquence)
+	- Cette partie vérifie aussi qu'une checkbox au moins a été cochée pour chaque question.
+
+<b>NB</b> : le bouton Submit, utilisé pour sauvegarder les données n'est pas un vrai bouton submit de formulaire, dans la mesure où on l'empêche de faire son taff ordinaire (avec <i>event.preventDefault()</i>).
 
 <a name="ou_stocker_PDF"/>
 4) Stocker des PDF
@@ -146,4 +175,25 @@ Ce dossier peut être accédé dans le fichier <b>template.html</b> à l'adresse
 
 ### PDF.JS
 
-La technologie utilisée pour afficher les PDF est PDF.JS (Mozilla). Qui permet d'afficher un PDF ( à une page donnée ), dans un Canvas. Il y a donc toute une partie du JS dédiée à la partie affichage du PDF.
+La technologie utilisée pour afficher les PDF est PDF.JS (Mozilla). Qui permet d'afficher un PDF (à une page donnée), dans un canvas HTML5. Il y a donc toute une partie du JS dédiée à la partie affichage du PDF.
+
+
+<a name ="deploiement_rapide">
+Déploiement rapide
+==================
+
+En ligne de commande, utilisant l'outil pbs [configuré](#configure).
+
+- Copier l'intégralité de ce dossier n'importe où, avec n'importe quel nom.
+
+- Modifier les fichiers
+
+	- tutorial.html _vide par défaut_
+	- long_description.md _vide par défaut_
+	- project.json
+	- tests_tasks.json <i>Ou créez votre fichier de tâche en JSON correspondant à model_tasks.json</i>
+
+- Lancer :
+	pbs create_project
+	pbs add_tasks --tasks-file tests_tasks.json --tasks-type=json redundancy=1
+	pbs update_project
