@@ -11,8 +11,9 @@
 </div>
 
 <div id='working_page'>
-<h1>here's the fucking page</h1>
-	
+	<h1 style="text-align:center;" id="statement">
+		
+	</h1>
 	<div id="document">
 		<div id="loading" class="alert alert-info">
 			<strong>Loading the PDF file...</strong>
@@ -54,6 +55,7 @@ function loadUserProgress() {
 
 pybossa.taskLoaded(function(task, deferred) {
 	if ( !$.isEmptyObject(task) ) {
+
 		//Here's the code to get the PDF name from /upload/pdfs/ located at the pybossa root folder 
 		//and display it into the page
 		PDFJS.getDocument("../../../uploads/pdfs/" + task.info.pdf).then(function(pdf) {
@@ -71,6 +73,7 @@ pybossa.presentTask(function(task, deferred) {
 	loadUserProgress();
 	// Code used to create the form
 	if ( !$.isEmptyObject(task) ) {
+		$('#statement').html(task.info.statement === undefined ? "Check the checkboxes at the end of the document to help us filing it." : task.info.statement);
 		$('#loading').hide();
 		$('#the_canvas').show();
 		var viewport = task.p.getViewport(scale);
