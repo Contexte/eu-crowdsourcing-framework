@@ -1,0 +1,17 @@
+[{
+	"pdf":"machin.pdf",
+	"page":1,
+	"statement": "ljkhgfhhjiphukgbghglihlhilgoig",
+	"questions":{
+		"do you want chewing gum?":["single", "yep", "no"],
+		"do you like apple pies?":["single", "ojh", "jhbgf"]
+	}
+},
+{
+	"pdf":"truc.pdf",
+	"page":8,
+	"questions":{
+		"need strawberries ?":["single", "oh", "a"],
+		"lklk,jhb":["multiple", "lkjhg", "oiuytg", "poijkh"]
+	}
+}]
