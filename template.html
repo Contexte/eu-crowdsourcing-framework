@@ -60,7 +60,7 @@ pybossa.taskLoaded(function(task, deferred) {
 pybossa.presentTask(function(task, deferred) {
 	// Code used to create the form
 	if ( !$.isEmptyObject(task) ) {
-		$('#statement').html(task.info.statement === undefined ? "Check the checkboxes at the end of the document to help us filing it." : task.info.statement);
+		$('#statement').html(task.statement === undefined ? "This document refers to a particular European Comission public consultation. Please read it and  check the checkboxes at the end of the document to help us filing it." : task.statement);
 		$('#loading').hide();
 		$('#the_canvas').show();
 		var viewport = task.p.getViewport(scale);

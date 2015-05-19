@@ -47,7 +47,7 @@ Les tâches sont les éléments précis sur lesquels intervient un membre de la 
 - Un Fichier JSON nommé <b>project.json</b>, qui sert à créer le projet et doit <b>obligatoirement</b> comprendre :
   - un champ "name"
   - un champ "short_name"
-  - un champ "description"
+  - un champ "statement"
 
   - d'autres champs sont optionnels et pourront être accédés dans le template
 
@@ -58,6 +58,7 @@ Exemple :
 		"name": "Nom Complet de Mon Projet",
 		"short_name": "slug du projet, utilisé par l'api RESTFUL pour y accéder",
 		"description": "Description courte du projet ; la longue se fait ailleurs",
+		"statement": "Phrase affichée sur toutes les tâches du projet."
 	}
 
 
@@ -97,7 +98,6 @@ Les fichiers devront contenir les informations spécifiques aux tâches, voici u
 	[{
 	        "pdf":"my_pdf_name.pdf",
 	        "page": 3,
-	        "statement": "What does the user have to do ? For example, it could be 'Look at the 4th paragraphe of that consultation and check the corresponding checkbox (in your opinion) at the end of the document.' If not explicitely defined, it defaults to : 'Check the checkboxes at the end of the document to help filing this document.'",
 	        "questions":{
 	                "First question (first paramater of answer determines its type : single or multiple answers possible)":["single", "yes", "no"],
 	                "Second question (multiple answers possible)":["multiple", "first answer", "second answer", "third answer"]
