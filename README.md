@@ -1,7 +1,26 @@
 comeurop
 ========
 
-Pour déployer rapidement un projet, voir : [Déploiement rapide](#deploiement_rapide)
+<a name ="deploiement_rapide">
+Déploiement rapide
+==================
+
+En ligne de commande, utilisant l'outil pbs [configuré](#configure).
+
+- Copier l'intégralité des fichiers non-cachés de ce dossier n'importe où, avec n'importe quel nom.
+
+- Modifier les fichiers (Les fichiers vides peuvent le rester)
+
+	- tutorial.html _vide par défaut_
+	- long_description.md _vide par défaut_
+	- project.json
+	- model_tasks.json <i>Ou créez votre fichier de tâche en JSON correspondant à model_tasks.json</i>
+	- template.html _En changeant UNIQUEMENT le nom (short name dans project.json et PAS name) à la fin du fichier dans pybossa.run(project short name)_
+
+- Lancer :
+	pbs create_project
+	pbs add_tasks --tasks-file tests_tasks.json --tasks-type=json redundancy=1
+	pbs update_project
 
 <a name="configure"/>
 Configurer pbs
@@ -178,23 +197,4 @@ Ce dossier peut être accédé dans le fichier <b>template.html</b> à l'adresse
 La technologie utilisée pour afficher les PDF est PDF.JS (Mozilla). Qui permet d'afficher un PDF (à une page donnée), dans un canvas HTML5. Il y a donc toute une partie du JS dédiée à la partie affichage du PDF.
 
 
-<a name ="deploiement_rapide">
-Déploiement rapide
-==================
 
-En ligne de commande, utilisant l'outil pbs [configuré](#configure).
-
-- Copier l'intégralité des fichiers non-cachés de ce dossier n'importe où, avec n'importe quel nom.
-
-- Modifier les fichiers (Les fichiers vides peuvent le rester)
-
-	- tutorial.html _vide par défaut_
-	- long_description.md _vide par défaut_
-	- project.json
-	- model_tasks.json <i>Ou créez votre fichier de tâche en JSON correspondant à model_tasks.json</i>
-	- template.html _En changeant UNIQUEMENT le nom (short name dans project.json et PAS name) à la fin du fichier dans pybossa.run(project short name)_
-
-- Lancer :
-	pbs create_project
-	pbs add_tasks --tasks-file tests_tasks.json --tasks-type=json redundancy=1
-	pbs update_project
