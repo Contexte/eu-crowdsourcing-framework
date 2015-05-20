@@ -49,10 +49,7 @@ pybossa.taskLoaded(function(task, deferred) {
 		//and display it into the page
 		PDFJS.getDocument("../../../uploads/pdfs/" + task.info.pdf).then(function(pdf) {
 			pdf.getPage(task.info.page).then(function(page) {
-				task.PDFJS_page;
-				// Needs to be tested
-				pdf.cleanup();
-				pdf.destroy();
+				task.PDFJS_page = page;
 				deferred.resolve(task);
 			})
 		});
