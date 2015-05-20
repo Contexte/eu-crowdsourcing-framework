@@ -1,54 +1,58 @@
-<div id='success' style='display:none;'>
-	<h2>The task has been successfully saved.</h2>
+<div id='task_success-message' style='display:none; font-size:1.5em;'>
+	The task has been successfully saved.
 </div>
 
-<div id='finish' style='display:none;'>
-	<h2>You have successfully contributed to all the tasks in this project. Thank you for your time. </h2>
+<div id='project_completed-message' style='display:none; font-size:1.5em;'>
+	You have successfully contributed to all the tasks in this project. Thank you for your time.
 </div>
 
-<div id='missing_check_box' style='display:none;'>
-	<h2 id='missing_check_box_phrase' style='color:red;'>All questions are mandatory.</h2>
+<div id='at_least_one_unanswered_question_from_HTML_form-message' style='display:none; font-size:1.5em; color:red;'>
+	All questions are mandatory.
 </div>
 
-<div id='working_page'>
-	<h1 style="text-align:center;" id="statement">
+<div id='PDF_and_questions-wrapper'>
+	<h1 style="text-align:center;" id="project_statement">
 		
 	</h1>
-	<div id="document">
-		<div id="loading" class="alert alert-info">
+	<div id="PDF_document-wrapper">
+		<div id="to_show_while_loading_PDF-message" class="alert alert-info">
 			<strong>Loading the PDF file...</strong>
 		</div>
-		<canvas id="the_canvas" style="border: 1px solid black; display:none;"/>
+		<canvas id="canvas_containing_task_PDF" style="border: 1px solid black; display:none;"/>
 	</div>
 
-	<div id="questions">
+	<div id="questions-wrapper">
 	<div>
 </div>
 
 <script src="http://mozilla.github.com/pdf.js/build/pdf.js"></script>  
 <script>
 
-var scale = 1.5;
-var canvas = document.getElementById('the_canvas');
-var context = canvas.getContext('2d');
+var document_scale = 1.5;
+// This has to be in vanilla JS, since a Jquery object to select the canvas doesn't allow us to get the real canvas
+var canvas_element = document.getElementById('canvas_containing_task_PDF');
+var context_of_canvas = canvas_element.getContext('2d');
 
 //Not sure we should keep that worker in production
 PDFJS.workerSrc = 'http://mozilla.github.com/pdf.js/build/pdf.worker.js';
 
 function resetTask(){
-	$('#questions').empty();
-	context.clearRect (0, 0, canvas.width, canvas.height);
+	$('#questions-wrapper').empty();
+	context_of_canvas.clearRect (0, 0, canvas_element.width, canvas_element.height);
 }
 
 
 pybossa.taskLoaded(function(task, deferred) {
-	if ( !$.isEmptyObject(task) ) {
+	if (!$.isEmptyObject(task)) {
 
 		//Here's the code to get the PDF name from /upload/pdfs/ located at the pybossa root folder 
 		//and display it into the page
 		PDFJS.getDocument("../../../uploads/pdfs/" + task.info.pdf).then(function(pdf) {
 			pdf.getPage(task.info.page).then(function(page) {
-				task.p = page;
+				task.PDFJS_page;
+				// Needs to be tested
+				pdf.cleanup();
+				pdf.destroy();
 				deferred.resolve(task);
 			})
 		});
@@ -59,103 +63,110 @@ pybossa.taskLoaded(function(task, deferred) {
 
 pybossa.presentTask(function(task, deferred) {
 	// Code used to create the form
-	if ( !$.isEmptyObject(task) ) {
-		$('#statement').html(task.statement === undefined ? "This document refers to a particular European Comission public consultation. Please read it and  check the checkboxes at the end of the document to help us filing it." : task.statement);
-		$('#loading').hide();
-		$('#the_canvas').show();
-		var viewport = task.p.getViewport(scale);
-		canvas.height = viewport.height;
-		canvas.width = viewport.width;
+	var default_project_statement = "This document refers to a particular European Comission public consultation. " +
+					"Please read it and  check the checkboxes at the end of the document to help us filing it.";
+	if (!$.isEmptyObject(task)) {
+		$('#project_statement').html(task.statement === undefined ? default_project_statement : task.statement);
+		$('#to_show_while_loading_PDF-message').hide();
+		$('#canvas_containing_task_PDF').show();
+		var viewport = task.PDFJS_page.getViewport(document_scale);
+		canvas_element.height = viewport.height;
+		canvas_element.width = viewport.width;
 
 		var renderContext = {
-			canvasContext: context,
+			canvasContext: context_of_canvas,
 			viewport: viewport
 		};
 		
 		// Generating the PDF on the canvas
-		task.p.render(renderContext);
+		task.PDFJS_page.render(renderContext);
 		
-		var answer;
-		var answer_type;
-		var question;
+		var currently_added_to_DOM_answer;
+		var answer_boxes_type;
+		var currently_added_to_DOM_question;
 		
 		// Generating  the HTML
-		$('#questions').append("<p><form id='choices'></form></p>");
+		$('#questions-wrapper').append("<p><form id='form_about_PDF_to_complete'></form></p>");
 		for(var j = 0; j < task.info.questions.length ; j++){
-			answer_type = task.info.questions[j].type
-			question = task.info.questions[j].utterance 
+			answer_boxes_type = task.info.questions[j].type
+			currently_added_to_DOM_question = task.info.questions[j].utterance 
 
-                        $('#choices').append("<fieldset id='question" + 
+                        $('#form_about_PDF_to_complete').append(
+						"<fieldset id='question_and_possible_responses-wrapper" + 
                                                 (j+1) + 
                                                 "'> <legend>" + 
-						question +
+						currently_added_to_DOM_question +
                                                 "</legend>" + 
-                                                 (answer_type === 'checkbox' ? 'You can check <strong>several</strong> answers' : 'You can <strong>only</strong> check <strong>one</strong> answer') +
-                                                "<br></fieldset>");
+                                                 (answer_boxes_type === 'checkbox' ? 
+							'You can check <strong>several</strong> answers' : 
+						 	'You can <strong>only</strong> check <strong>one</strong> answer'
+						) +
+                                                "<br></fieldset>"
+			);
+
 			for(var i = 0; i < task.info.questions[j].answers.length; i++){
-				answer = task.info.questions[j].answers[i]
+				currently_added_to_DOM_answer = task.info.questions[j].answers[i]
 				
 				// Create the answers according to their type.
-				$("#question"+(j+1)).append(
+				$("#question_and_possible_responses-wrapper"+(j+1)).append(
 						"<input class='possible_answer' type='" + 
-						answer_type +
+						answer_boxes_type +
 						"' name='" + 
 						task.info.parent_document + 
 						"!!" + 
 						task.info.pdf + 
 						"!!" + 
-						question  + 
+						currently_added_to_DOM_question  + 
 						"!!" + 
-						(answer_type === "checkbox" ? (i+1) : "" ) + 
+						(answer_boxes_type === "checkbox" ? (i+1) : "" ) + 
 						"' value='" + 
-						answer + 
+						currently_added_to_DOM_answer + 
 						"'>" + 
-						answer + 
+						currently_added_to_DOM_answer + 
 						"<br>"
 				);
 			}
-			$('#choices').append("<br>");
+			$('#form_about_PDF_to_complete').append("<br>");
 		}
-		$('#choices').append("<input id='submit' type='submit' value='Submit'>")
+		$('#form_about_PDF_to_complete').append("<input id='submit' type='submit' value='Submit'>")
 
 		// Submitting the infos of the form and saving it in DB
-		$('#choices').submit(function(event) {
+		$('#form_about_PDF_to_complete').submit(function(event) {
 			event.preventDefault();
 			$('html,body').scrollTop(0);
 
-			var unchecked = false;
+			var at_least_one_fieldset_without_any_answer_checked = false;
 
-			var fieldsets = $('fieldset');
-			fieldsets.each(function(index, value){
+			var all_fieldsets = $('fieldset');
+			var fieldset;
+			all_fieldsets.each(function(index, value){
 				fieldset = $(this);
 
-				//check is at least 1 box is checked in the fieldset
-				var checked = fieldset.find('input:checked').size() > 0;
-
-				if(!checked){
+				//making sure there is at least 1 box checked in the whole fieldset
+				if(fieldset.find('input:checked').size() === 0){
 					fieldset.find('legend').css('color','red');
-					unchecked = true;
+					at_least_one_fieldset_without_any_answer_checked = true;
 				}
 			});
 
-			if(unchecked){
-				$('#missing_check_box').show();
+			if(at_least_one_fieldset_without_any_answer_checked){
+				$('#at_least_one_unanswered_question_from_HTML_form-message').show();
 			} else {
-				$('#missing_check_box').hide();
-				var answer = $('form').serializeArray();
-				pybossa.saveTask(task.id, answer).done(function(){
-					$("#success").fadeIn();
+				$('#at_least_one_unanswered_question_from_HTML_form-message').hide();
+				var task_result = $('form').serializeArray();
+				pybossa.saveTask(task.id, task_result).done(function(){
+					$("#task_success-message").fadeIn();
 					resetTask();
-					setTimeout(function() { $("#success").fadeOut() }, 2000);
+					setTimeout(function() { $("#task_success-message").fadeOut() }, 2000);
 					deferred.resolve();
 				});
 			}
 		});
 	} else {
 		$(".skeleton").hide();
-		$("#loading").hide();
-		$("#working_page").hide();
-		$("#finish").fadeIn(500);
+		$("#to_show_while_loading_PDF-message").hide();
+		$("#PDF_and_questions-wrapper").hide();
+		$("#project_completed-message").fadeIn(500);
 	}
 });
 
