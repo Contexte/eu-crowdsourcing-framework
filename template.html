@@ -37,7 +37,7 @@ PDFJS.workerSrc = 'http://mozilla.github.com/pdf.js/build/pdf.worker.js';
 
 function resetTask(){
 	$('#questions').empty();
-	context.clearRect ( 0 , 0 , canvas.width, canvas.height );
+	context.clearRect (0, 0, canvas.width, canvas.height);
 }
 
 
@@ -74,27 +74,47 @@ pybossa.presentTask(function(task, deferred) {
 		
 		// Generating the PDF on the canvas
 		task.p.render(renderContext);
-
-		var j = 1
+		
+		var answer;
+		var answer_type;
+		var question;
 		
 		// Generating  the HTML
 		$('#questions').append("<p><form id='choices'></form></p>");
-		for(question in task.info.questions){
-			var answer_type = task.info.questions[question][0];
+		for(var j = 0; j < task.info.questions.length ; j++){
+			answer_type = task.info.questions[j].type
+			question = task.info.questions[j].utterance 
+
                         $('#choices').append("<fieldset id='question" + 
-                                                j + 
+                                                (j+1) + 
                                                 "'> <legend>" + 
-                                                question + 
+						question +
                                                 "</legend>" + 
-                                                 (answer_type === 'multiple' ? 'You can check <strong>several</strong> answers' : 'You can <strong>only</strong> check <strong>one</strong> answer') +
+                                                 (answer_type === 'checkbox' ? 'You can check <strong>several</strong> answers' : 'You can <strong>only</strong> check <strong>one</strong> answer') +
                                                 "<br></fieldset>");
-			for(var i = 1; i < task.info.questions[question].length; i++){
-				var answer = task.info.questions[question][i]
+			for(var i = 0; i < task.info.questions[j].answers.length; i++){
+				answer = task.info.questions[j].answers[i]
+				
 				// Create the answers according to their type.
-				$("#question"+j).append("<input class='possible_answer' type='radio' name='" + question + (answer_type  === 'multiple' ? ":" + answer : "")  + "' value='"+answer+ "'>"+answer+"<br>");
+				$("#question"+(j+1)).append(
+						"<input class='possible_answer' type='" + 
+						answer_type +
+						"' name='" + 
+						task.info.parent_document + 
+						"!!" + 
+						task.info.pdf + 
+						"!!" + 
+						question  + 
+						"!!" + 
+						(answer_type === "checkbox" ? (i+1) : "" ) + 
+						"' value='" + 
+						answer + 
+						"'>" + 
+						answer + 
+						"<br>"
+				);
 			}
 			$('#choices').append("<br>");
-			j++;
 		}
 		$('#choices').append("<input id='submit' type='submit' value='Submit'>")
 
