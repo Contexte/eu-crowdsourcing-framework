@@ -1,16 +1,43 @@
 [{
+	"parent_document":"Name of the document from which the later PDF is extracted. Also used to put together several parts of the same document once they have been answered.",
 	"pdf":"my_pdf_name.pdf",
-	"page": 3,
-	"questions":{
-		"First question (first paramater of answer determines its type : single or multiple answers possible)":["single", "yes", "no"],
-		"Second question (multiple answers possible)":["multiple", "first answer", "second answer", "third answer"]
-	}
+	"page":3,
+	"questions":[
+		{
+			"type":"'radio' for a single answer among several questions, 'checkbox' for several answers among several questions",
+			"utterance":"Here you ask the question in plain text : 'What is your favorite color ?'",
+			"answers" : [
+				"Answer number one",
+				"Answer number two",
+				"Answer number three"
+			]
+		}
+	]	
 },
 {
+	"parent_document":"European_Bretzel_factory_answer_to_Shape_of_Bretzels_Consultation-2018.pdf",
 	"pdf":"another_pdf_name.pdf",
-	"page": 6,
-	"questions":{
-		"First question (only one answer possible)":["single", "first answer", "second answer"],
-		"Second question":["single", "a", "b"]
-	}		
+	"page": 1,
+	"questions":[
+		{
+			"type":"checkbox",
+			"utterance":"What shape of bretzels do you like for breakfast ?",
+			"answers" : [
+				"Round",
+				"Rectangular",
+				"Bretzel-shaped",
+				"Triangular"
+			]
+		},
+		{
+			"type":"radio",
+			"utterance":"How do you like Bretzels after 8 ?"
+			"answers": [
+				"Baked",
+				"Slighlty fried",
+				"Burnt to the ground",
+				"I don't even like bretzels anyway"
+			]
+		}
+	]	
 }]
