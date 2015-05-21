@@ -63,7 +63,7 @@ pybossa.presentTask(function(task, deferred) {
 	var default_project_statement = "This document refers to a particular European Comission public consultation. " +
 					"Please read it and  check the checkboxes at the end of the document to help us filing it.";
 	if (!$.isEmptyObject(task)) {
-		$('#project_statement').html(task.statement === undefined ? default_project_statement : task.statement);
+		$('#project_statement').html(task.info.statement === undefined ? default_project_statement : task.info.statement);
 		$('#to_show_while_loading_PDF-message').hide();
 		$('#canvas_containing_task_PDF').show();
 		var viewport = task.PDFJS_page.getViewport(document_scale);
