@@ -2,5 +2,4 @@
 	"name" : "Name of the Project",
 	"short_name" : "Slug of the project, by which pybossa access it in the URL",
 	"description": "Description on the test project",
-	"statement" : "A sentence which will be displayed at the begining of each tasks of that project. Explains what the user have to do and which concultation this documents refers to."
 }
