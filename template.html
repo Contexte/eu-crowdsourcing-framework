@@ -86,7 +86,7 @@ pybossa.presentTask(function(task, deferred) {
 		$('#questions-wrapper').append("<p><form id='form_about_PDF_to_complete'></form></p>");
 		for(var j = 0; j < task.info.questions.length ; j++){
 			answer_boxes_type = task.info.questions[j].type
-			currently_added_to_DOM_question = task.info.questions[j].utterance 
+			currently_added_to_DOM_question = task.info.questions[j].utterance
 
                         $('#form_about_PDF_to_complete').append(
 						"<fieldset id='question_and_possible_responses-wrapper" + 
@@ -105,10 +105,12 @@ pybossa.presentTask(function(task, deferred) {
 				currently_added_to_DOM_answer = task.info.questions[j].answers[i]
 				
 				// Create the answers according to their type.
+				// We do need double quotes around name and value in case the question or answer
+				// 	- contains simple quote.
 				$("#question_and_possible_responses-wrapper"+(j+1)).append(
 						"<input class='possible_answer' type='" + 
 						answer_boxes_type +
-						"' name='" + 
+						"' name=\"" + 
 						task.info.parent_document + 
 						"!!" + 
 						task.info.pdf + 
@@ -116,9 +118,9 @@ pybossa.presentTask(function(task, deferred) {
 						currently_added_to_DOM_question  + 
 						"!!" + 
 						(answer_boxes_type === "checkbox" ? (i+1) : "" ) + 
-						"' value='" + 
+						"\" value=\"" + 
 						currently_added_to_DOM_answer + 
-						"'>" + 
+						"\">" + 
 						currently_added_to_DOM_answer + 
 						"<br>"
 				);
