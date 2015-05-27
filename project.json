@@ -1,5 +1,5 @@
 {
 	"name" : "Name of the Project",
 	"short_name" : "Slug of the project, by which pybossa access it in the URL",
-	"description": "Description on the test project",
+	"description": "Description on the test project"
 }
