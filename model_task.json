@@ -1,8 +1,9 @@
 [{
-	"parent_document":"Name of the document from which the later PDF is extracted. Also used to put together several parts of the same document once they have been answered.",
-	"pdf":"my_pdf_name.pdf",
+	"organization":"Name of the organization that answered the European consultation and to wich answer is linked the later pdf",
+	"part":"Part of the PDF which is treated. Could be 'Part 1' or something more excplicit like 'Shape of bretzels at the morning', the important thing being : EVERY ORGANIZATION MUST HAVE THE SAME AMOUNT OF PARTS TREATED, AND THESE PARTS MUST HAVE THE SAME NAME. See the README for more informations.",
+	"pdf":"name of the PDF to show the user, example : my_pdf_name.pdf. Must be located at pybossa/uploads/pdfs by default.",
 	"page":3,
-	"statement":"A sentence which will be displayed at the begining of each tasks of that project. Explains what the user have to do and which concultation this documents refers to."
+	"statement":"A sentence which will be displayed at the begining of each tasks of that project. Explains what the user have to do and which concultation this documents refers to.",
 	"questions":[
 		{
 			"type":"'radio' for a single answer among several questions, 'checkbox' for several answers among several questions",
@@ -16,11 +17,10 @@
 	]	
 },
 {
-	"parent_document":"European_Bretzel_factory_answer_to_Shape_of_Bretzels_Consultation-2018.pdf",
-	"pdf":"another_pdf_name.pdf",
+	"organization":"European Bretzel Factory",
+	"pdf":"European_Bretzel_factory_answer_to_European_consult_2018_part_1.pdf",
 	"page": 1,
-	"statement":"Please help us find how these guys like their bretzels"
-
+	"statement":"Please help us find how these guys like their bretzels",
 	"questions":[
 		{
 			"type":"checkbox",
