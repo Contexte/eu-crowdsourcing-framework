@@ -1,11 +1,23 @@
-Comeurop
-========
+European Commission consultations crowdsourcing tool
+====================================================
+
+Index
+-----
+
+[Getting started](#getting_started)
+[Configure pbs](#configure_pbs)
+[Create your project](#create_your_project)
+[Load tasks](#load_tasks)
+[Project update](#project_update)
+[PDF storage](#pdf_storage)
+[PyBossa modifications](#pybossa_modifications)
+
 
 <a name ="getting_started">
 Getting started
-===============
+---------------
 
-Using the command line (pbs), check it's properly [configured](#configure).
+Using the command line (pbs), check it's properly [configured](#configure_pbs).
 
 - Copy every unhidden file of this folder into another one ; anywhere, under any name. If you're cloning it from github, do not forget to clone it recursively, as this project has a submodule (PDF.js).
 
@@ -23,9 +35,9 @@ Using the command line (pbs), check it's properly [configured](#configure).
 
 	pbs update_project
 
-<a name="configure"/>
+<a name="configure_pbs"/>
 Configure pbs
---------------
+-------------
 
 Pbs should already be configured with the admin key. If it's not, you can configure it in the hidden file <b>.pybossa.cfg</b>, located in the <b>home</b> directory. Here is how it should be written :
 
@@ -37,11 +49,11 @@ If it's not set and you don't wan't to set it, you still can run every admin com
 
 	pbs --server http://your_server.com --api-key your_key subcommand
 
-You also may want to create a <b>pdfs</b> folder at pybossa/uploads/, since the tempalte is going to search this folder for your pdf. See [PDF Storage](#PDF_storage)
+You also may want to create a <b>pdfs</b> folder at pybossa/uploads/, since the tempalte is going to search this folder for your pdf. See [PDF Storage](#pdf_storage)
 
-
-1) Create your project
-----------------------
+<a name="create_your_project">
+Create your project
+-------------------
 
 To create your project with pbs (there are other ways, but we won't cover them here), you have to create a folder anywhere on the disk, and a file called project.json [(see the file's details)](#project.json) in it.
 
@@ -87,12 +99,12 @@ They are only mandatory to call <i>pbs update_project</i>, since you don't reall
 
 ### What the project folder should contain :
 
-- One (or more) JSON files to describe every tasks. You can give them any name. To use them, see [loading tasks](#loading_tasks).
+- One (or more) JSON files to describe every tasks. You can give them any name. To use them, see [loading tasks](#load_tasks).
 
 
-<a name="loading_tasks"/>
-2) Loading tasks
-----------------
+<a name="load_tasks"/>
+Load tasks
+----------
 
 Once you have created your project, the next step is to put tasks in it.
 
@@ -134,9 +146,9 @@ Les fichiers devront contenir les informations spécifiques aux tâches, voici u
 
 <b>NB2 : </b> Any information you put into your tasks_filles will eventually end in the <i>info</i> part of the <i>task</i> associative array. You can access it in the template (see below) via <b>task.info.yourStuff</b>.
 
-<a name="update"/>
-3) Update du Projet
--------------------
+<a name="project_update"/>
+Project update
+--------------
 
 Before you could even update the project, you will need all the mandatory files that we have spoken of earlier into your project folder.
 
@@ -154,7 +166,7 @@ This line should be executed every time you're modifying the template.
 
 ### The HTML Part
 
-Light, most of it is generated via JS.
+Not much of it, since it is mostly generated via JS.
 
 ### pybossa.taskLoaded
 
@@ -180,9 +192,9 @@ It contains 3 major code blocks, which are :
 
 <b>NB</b> : The submit button is not a real one, since its default behavior is prevented by : <i>event.preventDefault()</i>
 
-<a name="PDF_Storage"/>
-4) PDF storage
---------------
+<a name="pdf_Storage"/>
+PDF storage
+-----------
 
 At the root of the pybossa folder, there is another folder called <b>uploads</b>. This folder contains every assets of the website and can be changed from the <b>settings_local.py</b> file. By modifying the value of <b>UPLOAD_FOLDER</b>.
 
@@ -191,3 +203,18 @@ This folder can be accessed from the file <b>template.html</b> at : ../../upload
 ### PDF.JS
 
 PDF.JS (Mozilla) is used to display the PDFs on the HTML canvas.
+
+
+<a name="pybossa_modifications"/>
+PyBossa modifications
+---------------------
+
+Finally, in this folder, you can see another one called _pybossaMods_.
+
+It contains several files, that you can use to enhance pybossa and make it able to parse the kind of datas you should get in this project.
+
+ - project.py : _is the project's view (controller of MVC). The enhanced version has a route and a method more, used to support the 'analyzer', which is used to parse the datas. To put in_ pybossa/pybossa/view/project.py
+    - homemade_part_of_project.py : _same as project.py, but only contains the part that doesn't come with pyBossa._
+ - tasks.html : _is a static page that allow you to chose between several actions to do on a project tasks and tasksruns. The enhanced version contains a block called "Analyzer" that allow you to click on it to access the analyzer template via its route. Tu put in_ pybossa/pybossa/themes/default/templates/projects/tasks.html
+ - analyzer.html : _is the template of the analyzer, accessed by the route written in the_ project.py _file. It contains the logic used to display and order the tasks runs in Javascript. Basically, tasks runs are ordered in two ways : by organizations and by parts of PDF. These two ways are crossed in an HTML table to properly be displayed._
+ - tasks_run_analyzer.py : _is a script used to display the tasks runs, orderded only by organizations. Untested since I changed the data model from parent pdf to organization and doesalmost the same thing than the analyzer.html, only in python._
