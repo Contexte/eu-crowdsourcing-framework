@@ -4,13 +4,13 @@ European Commission consultations crowdsourcing tool
 Index
 -----
 
-[Getting started](#getting_started)
-[Configure pbs](#configure_pbs)
-[Create your project](#create_your_project)
-[Load tasks](#load_tasks)
-[Project update](#project_update)
-[PDF storage](#pdf_storage)
-[PyBossa modifications](#pybossa_modifications)
+ - [Getting started](#getting_started)
+ - [Configure pbs](#configure_pbs)
+ - [Create your project](#create_your_project)
+ - [Load tasks](#load_tasks)
+ - [Project update](#project_update)
+ - [PDF storage](#pdf_storage)
+ - [PyBossa modifications](#pybossa_modifications)
 
 
 <a name ="getting_started">
@@ -29,6 +29,7 @@ Using the command line (pbs), check it's properly [configured](#configure_pbs).
 	- model_tasks.json <i>Or create your JSON taskfile, using model_tasks.json</i>
 	- template.html <i>Change the name (corresponding to the 'short_name' of your project.json) at the end of the file, in</i> pybossa.run(project short name) <i>and check the pdf folder is the right one </i>(/pybossa/uploads/pdfs by default)
 - Run :
+
 	pbs create_project
 
 	pbs add_tasks --tasks-file tests_tasks.json --tasks-type=json --redundancy=1
@@ -106,15 +107,18 @@ They are only mandatory to call <i>pbs update_project</i>, since you don't reall
 Load tasks
 ----------
 
-Once you have created your project, the next step is to put tasks in it.
+Once you have created your project, the next step is to put your tasks in it.
 
 There are two ways of doing it :
 
 - Using the website and the CSV format (including a Google spreadshit). Note that the data uploaded using this method will be ultimately stored as JSON.
 
 - In command line using pbs : <i>
+
 	pbs add_tasks --tasks-file my_tasks.csv|json --tasks-type=csv|json [--redundancy=1] #, default to 30
-	</i>, where you can use CSV or JSON ; again, it will ultimately stored as JSON.
+	</i>
+
+ where you can use CSV or JSON ; again, it will ultimately stored as JSON.
 
 <a name="tasks.json"/>
 Les fichiers devront contenir les informations spécifiques aux tâches, voici un exemple de fichier JSON :
@@ -213,8 +217,8 @@ Finally, in this folder, you can see another one called _pybossaMods_.
 
 It contains several files, that you can use to enhance pybossa and make it able to parse the kind of datas you should get in this project.
 
- - project.py : _is the project's view (controller of MVC). The enhanced version has a route and a method more, used to support the 'analyzer', which is used to parse the datas. To put in_ pybossa/pybossa/view/project.py
-    - homemade_part_of_project.py : _same as project.py, but only contains the part that doesn't come with pyBossa._
- - tasks.html : _is a static page that allow you to chose between several actions to do on a project tasks and tasksruns. The enhanced version contains a block called "Analyzer" that allow you to click on it to access the analyzer template via its route. Tu put in_ pybossa/pybossa/themes/default/templates/projects/tasks.html
- - analyzer.html : _is the template of the analyzer, accessed by the route written in the_ project.py _file. It contains the logic used to display and order the tasks runs in Javascript. Basically, tasks runs are ordered in two ways : by organizations and by parts of PDF. These two ways are crossed in an HTML table to properly be displayed._
+ - project.py : _is the project's view (controller of MVC). The enhanced version has a route and a method more, used to support the 'analyzer', which is used to parse the datas. To put in_ <b>pybossa/pybossa/view/project.py</b>
+    - homemade_part_of_project.py : _same as_ project.py_, but only contains the part that doesn't come with pyBossa._
+ - tasks.html : _is a static page that allow you to chose between several actions to do on a project tasks and tasksruns. The enhanced version contains a block called "Analyzer" that allow you to click on it to access the analyzer template via its route. Tu put in_ <b>pybossa/pybossa/themes/default/templates/projects/tasks.html</b>
+ - analyzer.html : _is the template of the analyzer, accessed by the route written in the_ project.py _file. It contains the logic used to display and order the tasks runs in Javascript. Basically, tasks runs are ordered in two ways : by organizations and by parts of PDF. These two ways are crossed in an HTML table to properly be displayed. To put in_ <b>pybossa/pybossa/themes/default/template/projects/analyzer.html</b>
  - tasks_run_analyzer.py : _is a script used to display the tasks runs, orderded only by organizations. Untested since I changed the data model from parent pdf to organization and doesalmost the same thing than the analyzer.html, only in python._
