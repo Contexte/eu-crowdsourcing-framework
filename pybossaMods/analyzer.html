@@ -1,0 +1,254 @@
+{% extends "/base.html" %}
+{% set active_page = "projects" %}
+{% set active_project = "all" %}
+
+{% block content %}
+
+
+<style>
+    table {
+        border-collapse: collapse;
+        border: 1px solid black;
+    }
+    th {
+        padding: 1em;
+    }
+    td {
+        border: 1px solid black;
+        padding: 1em;
+    }
+</style>
+
+
+<div>
+    <select id="insert_new_organization-dropdown_list">
+        <option value="undefined"> Organizations </option>
+    <select>
+</div>
+
+<div>
+    <select id="insert_new_part-dropdown_list"> 
+        <option value="undefined"> Parts </option>
+    </select>
+</div>
+
+<div>
+	<table style='border-width:1px solid black;'>
+		<tbody>
+			<th>
+				<th colspan="3" id="vertical_HTML_table_header">
+                    Organizations
+                </th>
+				<tr id="organizations_names_row">
+				    <th rowspan="2" id="horizontal_HTML_table_header">
+                        Parts
+                    </th>
+                    <td style="background-color : grey;"></td>
+				</tr>
+			</th>
+			<tr>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<script>
+    var TR_part_ordered_assoc_array = {};
+	var TR_organization_ordered_assoc_array = {};
+	var task_run;
+	var organization;
+	var part;
+	var question;
+	var answer;
+	var pybossa_project_datas = {{_(json_pybossa_project_datas)}}
+
+    // Iterate over each task run to get datas.
+	for (var i = 0; i < pybossa_project_datas.length ; i++){
+		for (var j = 0; j < pybossa_project_datas[i].info.length ; j++){
+			task_run = pybossa_project_datas[i].info[j].name.split('!!');
+			answer = pybossa_project_datas[i].info[j].value;
+			organization = task_run[0];
+			part = task_run[1];
+			question = task_run[2];
+
+			// Create an associative array, sorted by organizations.
+			if (TR_organization_ordered_assoc_array[organization]) {
+				if (TR_organization_ordered_assoc_array[organization][part]) {
+					if (
+                        TR_organization_ordered_assoc_array
+                                        [organization]
+                                        [part]
+                                        [question]
+                    ) {
+						TR_organization_ordered_assoc_array 
+                                        [organization] 
+                                        [part] 
+                                        [question] 
+                                        .push(answer);
+					} else {
+						TR_organization_ordered_assoc_array 
+                                        [organization] 
+                                        [part] 
+                                        [question] = [answer];
+					}
+				} else {
+					TR_organization_ordered_assoc_array 
+                                        [organization] 
+                                        [part] = {};
+					TR_organization_ordered_assoc_array 
+                                        [organization] 
+                                        [part] 
+                                        [question] = [answer];
+				}
+			} else {
+				TR_organization_ordered_assoc_array 
+                                        [organization] = {};
+				TR_organization_ordered_assoc_array 
+                                        [organization] 
+                                        [part] = {};
+				TR_organization_ordered_assoc_array 
+                                        [organization] 
+                                        [part] 
+                                        [question] = [answer];
+			}
+
+            // Create an associative array, sorted by parts.
+            if (TR_part_ordered_assoc_array[part]) {
+                if (TR_part_ordered_assoc_array[part][organization]) {
+                    if (
+                        TR_part_ordered_assoc_array 
+                                        [part] 
+                                        [organization] 
+                                        [question]
+                    ) {
+                        TR_part_ordered_assoc_array[part] 
+                                        [organization] 
+                                        [question] 
+                                        .push(answer);
+                    } else {
+                        TR_part_ordered_assoc_array 
+                                        [part] 
+                                        [organization] 
+                                        [question] = [answer];
+                    }
+                } else {
+					TR_part_ordered_assoc_array[part] 
+                                        [organization] = {};
+                    TR_part_ordered_assoc_array[part] 
+                                        [organization] 
+                                        [question] = [answer];
+                }
+            } else {
+                TR_part_ordered_assoc_array[part] = {};
+                TR_part_ordered_assoc_array 
+                                        [part] 
+                                        [organization] = {};
+                TR_part_ordered_assoc_array 
+                                        [part] 
+                                        [organization] 
+                                        [question] = [answer];
+            }
+
+		}
+	}
+
+    // Populate the Organizations dropdown list.
+	for (_organization in TR_organization_ordered_assoc_array) {
+        		$('#insert_new_organization-dropdown_list')
+                                    .append( 
+                                        "<option value='" + 
+                                        _organization + 
+                                        "'>" + 
+                                         _organization + 
+                                         "</option>" 
+                                    );
+	}
+
+    // Populate the parts dropdown list.
+    for (_part in TR_part_ordered_assoc_array) {
+        		$('#insert_new_part-dropdown_list') 
+                                    .append( 
+                                        "<option value='" + 
+                                         _part + 
+                                         "'>" + 
+                                         _part + 
+                                         "</option>" 
+                                    );
+	}
+
+    // Add a column with the organization name and hanlde the change in the table.
+    $('#insert_new_organization-dropdown_list').change(function(){
+        var _organization = $(this).val();
+        var _part;
+        $('#organizations_names_row').append( 
+                                       "<td class='" + 
+                                       "organization_name_in_html_table'>" + 
+                                       _organization + 
+                                       "</td>" 
+                                     );
+        $('.part_title_in_html_table').each(function(){
+            if ($(this) != undefined) {
+                _part = $(this).html();
+                row = $(this).parent();
+                row.append("<td></td>");
+                for (_question in TR_part_ordered_assoc_array  
+                                         [_part]  
+                                         [_organization] 
+                ) {
+                    row.children().last() 
+                                     .append( 
+                                         _question + 
+                                          " : " + 
+                                          TR_organization_ordered_assoc_array  
+                                         [_organization]  
+                                         [_part]  
+                                         [_question] 
+                                     );
+                }
+            }
+        });
+    });
+
+    // Add a row with the part title and handle the change in the table.
+    $('#insert_new_part-dropdown_list').change(function(){
+
+        // This line is used to keep the left TableHead cell
+        // at the right size, so the table keep its layout.
+        $('#horizontal_HTML_table_header').attr(
+                                            'rowspan',  
+                                            (parseInt( 
+                                            $('#horizontal_HTML_table_header') 
+                                            .attr('rowspan') 
+                                            )+1) 
+                                          ); 
+
+        var _organization;
+        var _part = $(this).val();
+        $('tbody').append(
+                    "<tr><td class='part_title_in_html_table'>" + 
+                    $(this).val() + 
+                    "</td></tr>" 
+                  );
+
+        $('.organization_name_in_html_table').each(function(){
+            if ($(this) != undefined) {
+                _organization = $(this).html();
+                $('tr').last().append("<td></td>");
+                for (_question in TR_part_ordered_assoc_array[_part]  
+                                         [_organization]
+                     ) 
+                {
+                    $('td').last().append(_question + 
+                                          " : " + 
+                                          TR_part_ordered_assoc_array  
+                                         [_part]  
+                                         [_organization]  
+                                         [_question] 
+                                  );
+                }
+            }
+        });
+    });
+    
+</script>
+{% endblock %}
